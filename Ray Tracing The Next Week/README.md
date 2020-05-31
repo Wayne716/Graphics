@@ -26,3 +26,14 @@
     - 球类用球心和半径计算包围盒
     - 移动球类用起止点的两个包围盒的合并盒
     - 对列表中的每个物体迭代地求合并包围盒
+   
+   
+
+    章节3: Solid Textures
+    
+    棋盘材质用坐标的正弦或余弦来实现周期性，分为两个固定着色材质。
+    
+    新添加类：材质
+    - 材质替换掉颜色衰减向量
+    
+![alt text](https://github.com/Wayne716/Graphics/blob/master/Ray%20Tracing%20The%20Next%20Week/images/two_spheres.png?raw=true)
