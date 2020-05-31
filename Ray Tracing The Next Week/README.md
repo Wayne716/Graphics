@@ -1,5 +1,5 @@
 
-    章节1: Motion Blur
+章节1: Motion Blur
     
     在快门时间断内随机采样。再多重采样。
     光线记录“当前时间”，与运动到此刻的物体求交。
@@ -12,7 +12,7 @@
 
 ![alt text](https://github.com/Wayne716/Graphics/blob/master/Ray%20Tracing%20The%20Next%20Week/images/blur.png?raw=true)
 
-    章节2: Bounding Volume Hierarchies
+章节2: Bounding Volume Hierarchies
     
     新添加类：包围盒类（与光线求交）
     - 时间段求交集：取最大的起点和最小的终点
@@ -28,7 +28,7 @@
     - 对列表中的每个物体迭代地求合并包围盒
 
 
-    章节3: Solid Textures
+章节3: Solid Textures
     
     棋盘材质用坐标的正弦或余弦来实现周期性，分为两个固定着色材质。
     
