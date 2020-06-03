@@ -7,7 +7,7 @@ struct hit_record {
     float t;
     vec3 p; // exact hit point
     vec3 normal;
-    material *mat_ptr;
+    material *mat;
 };
 
 class hitable {

@@ -39,7 +39,7 @@ bool moving_sphere::hit(const ray &r, float tmin, float tmax, hit_record &rec) c
             rec.t = temp;
             rec.p = r.point_at_parameter(rec.t);
             rec.normal = (rec.p - center(r.time())) / radius;
-            rec.mat_ptr = mat;
+            rec.mat = mat;
             return true;
         }
         temp = (-b + sqrt(discriminant)) / a;
@@ -47,7 +47,7 @@ bool moving_sphere::hit(const ray &r, float tmin, float tmax, hit_record &rec) c
             rec.t = temp;
             rec.p = r.point_at_parameter(rec.t);
             rec.normal = (rec.p - center(r.time())) / radius;
-            rec.mat_ptr = mat;
+            rec.mat = mat;
             return true;
         }
     }
