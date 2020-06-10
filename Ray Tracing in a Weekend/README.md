@@ -58,6 +58,6 @@ P3             // 编码格式
 >> 由`hittable`派生`sphere`  实现球类与光线求交<br>
 
 
-再将场景中的所有物体装入list(vector)中，光线射出后与场景中的物体逐一求交(zbuffer)。
+将场景中的所有物体装入list(vector)中，光线射出后与场景中的物体逐一求交(zbuffer)。
 
 
