@@ -40,6 +40,7 @@ P3             // 编码格式
 ### 5. 球
 
 联立光线和球的表达式解二次方程
+
 判定函数:
 `bool hit_sphere(const point3& center, double radius, const ray& r)`
 
