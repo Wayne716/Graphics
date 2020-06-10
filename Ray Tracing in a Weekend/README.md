@@ -50,10 +50,9 @@ P3             // 编码格式
 `球面法向量 = 球面上的点 - 球心`
 
 
-> 构建hittable基类，成员函数为与光线求交的纯虚函数<br>
-> `virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const = 0;`<br>
+> 构建`hittable`基类，成员函数为与光线求交的纯虚函数。<br>
 >
->其中`hit_record`是引用传参，成员包含：`与光线的交点，和光线相交物体的法向量，射线参数t，法向量调整函数。`<br>
+> 其中`hit_record`是引用传参，成员包含：`与光线的交点，和光线相交物体的法向量，射线参数t，法向量调整函数。`<br>
 >
 >> 由`hittable`派生`hittable_list`  成员为：`vector<shared_ptr<hittable>>`<br>
 >>
