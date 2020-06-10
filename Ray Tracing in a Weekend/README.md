@@ -46,8 +46,8 @@ P3             // 编码格式
 ---
 ### 6. 法向量
 
-`球面法向量 = 球面上的点 - 球心`<br>
-将光线与球的交点的法向量映射为RGB渲染出球体
+将光线与球的交点的法向量映射为RGB渲染出球体<br>
+`球面法向量 = 球面上的点 - 球心`
 
 
 构建hittable基类，成员函数为与光线求交的纯虚函数<br>
@@ -55,12 +55,12 @@ P3             // 编码格式
 
 其中`hit_record`是引用传参，成员包含：与光线的交点，和光线相交物体的法向量，射线参数t，法向量调整函数。<br>
 
-由`hittable`派生`hittable_list`便于计算求交<br>
+由`hittable`派生`hittable_list`  成员为：`vector<shared_ptr<hittable>>`<br>
 
-由`hittable`派生`sphere`实现球类与光线求交<br>
+由`hittable`派生`sphere`  实现球类与光线求交<br>
 
 
-再将场景中的所有物体装入`vector<shared_ptr<hittable>>`<br>
+再将场景中的所有物体装入list(vector)中
 光线射出后与场景中的物体逐一求交(zbuffer)
 
 
