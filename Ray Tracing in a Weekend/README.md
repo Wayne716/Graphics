@@ -91,12 +91,14 @@ Lambertian：取相切球面上的点。 靠近法向量的散射方向的概率
 ---
 ### 9. 金属
 
+> 构建`material`基类，成员函数为散射的纯虚函数，参数为：`ray, hit_record, &attenuation, &sacttered`<br>
+>> 由`material`派生`lambertian` 实现光线的漫反射<br>
+>>
+>> 由`meterial`派生`metal` 实现光线的镜面反射，磨砂处理由随机调整反射光线实现。
+>>> `散射方向 = 反射方向 + 模糊率 * 单位球中的随机点`
 
-
-
-
-
-
+将`material`添加到`hit_record`的成员参数中，<br>
+光线击中物体后，由指针判定散射方法，对散射的光线递归求交。
 
 
 
