@@ -60,4 +60,18 @@ P3             // 编码格式
 
 将场景中的所有物体装入list(vector)中，光线射出后与场景中的物体逐一求交(zbuffer)。
 
+---
+### 7. 反走样
 
+通过多重采样周围的像素反走样，随机生成 \[0, 1) ：
+```
+static std::random_device seed;
+static std::mt19937 generator(seed());
+static std::uniform_real_distribution<double> distribution(0.0, 1.0);
+return distribution(generator);
+```
+
+整合camera类，成员包含：光线生成函数`ray get_ray(double u, double v)`
+
+光线从视点向投影面逐个像素值射出，由N条光线采样距离该像素\[0, 1)距离的像素，<br>
+与场景中的物体逐一求交，累加后取均值。
