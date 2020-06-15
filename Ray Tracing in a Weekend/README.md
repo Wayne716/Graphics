@@ -2,6 +2,7 @@
 
 `Ray Tracing in One Weekend w/ C++ 11 features`
 
+![](images/image.png)
 ---
 ### 2. 生成图像
 
