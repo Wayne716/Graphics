@@ -33,3 +33,12 @@ BVH建树：
 对区间中的物体的包围盒的小端按轴坐标排序
 左右子树各放一半
 ```
+
+---
+### 4. 材质
+
+> 构造texture类，成员为返回颜色的纯虚函数
+>> material类派生solid_color，替换掉原有的color(r,g,b)<br>
+>>
+>> material类派生checker_texture，实现棋盘材质，成员变量为两个solid_color
+>>> 求采样点的坐标的弦函数从而实现周期化，对正值负值用不同的solid_color返回颜色
