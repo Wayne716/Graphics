@@ -35,12 +35,12 @@ BVH建树：
 ```
 
 ---
-### 4. 材质
+### 4. 纹理
 
 > 构造texture类，成员为返回颜色的纯虚函数
 >> material类派生solid_color，替换掉原有的color(r,g,b)<br>
 >>
->> material类派生checker_texture，实现棋盘材质，成员变量为两个solid_color
+>> material类派生checker_texture，实现棋盘纹理，成员变量为两个solid_color
 >>> 求采样点的坐标的弦函数从而实现周期化，对正值负值用不同的solid_color返回颜色
 
 
@@ -66,7 +66,15 @@ Perlin Noise：
 根据uv求得stbi_load()返回的char* 中的位置<br>
 
 
+---
+### 7. 区域光
 
-
+材质类新增发光函数成员<br>
+```
+对于不发光物体：发光函数直接返回
+对于发光物体：不发生散射，发光由固定颜色纹理实现
+```
+对于光线与矩形的求交，先根据矩形所垂直的轴的分量求出时间，<br>
+再验证其他两个分量在此刻是否在矩形的边界内。
 
 
