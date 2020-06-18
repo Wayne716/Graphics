@@ -63,7 +63,7 @@ Perlin Noise：
 
 用stb_image.h的stbi_load()读取材质图片<br>
 根据球体与光线的交点的极坐标求得uv<br>
-根据uv求得接口返回的char* 中的位置<br>
+根据uv求得stbi_load()返回的char* 中的位置<br>
 
 
 
