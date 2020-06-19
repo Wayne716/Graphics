@@ -11,6 +11,7 @@
 
 光线发出后，与此刻运动到某位置的球求交。
 
+![](images/moving_sphere.jpg)
 
 ---
 ### 3. 包围盒
@@ -43,6 +44,7 @@ BVH建树：
 >> material类派生checker_texture，实现棋盘纹理，成员变量为两个solid_color
 >>> 求采样点的坐标的弦函数从而实现周期化，对正值负值用不同的solid_color返回颜色
 
+![](images/two_spheres.jpg)
 
 ---
 ### 5. 噪声
@@ -57,6 +59,12 @@ Perlin Noise：
 对所求点指向晶格各点的向量与晶格各点的随机向量作点积
 对点积的插值之和可以用缓和曲线过渡
 ```
+![](images/hashed.jpg)
+![](images/interpolate.jpg)
+![](images/hermitian.jpg)
+![](images/shift.jpg)
+![](images/turbulence.jpg)
+![](images/marble.jpg)
 
 ---
 ### 6. 映射
@@ -65,6 +73,7 @@ Perlin Noise：
 根据球体与光线的交点的极坐标求得uv<br>
 根据uv求得stbi_load()返回的char* 中的位置<br>
 
+![](images/earth.jpg)
 
 ---
 ### 7. 区域光
@@ -77,6 +86,8 @@ Perlin Noise：
 对于光线与矩形的求交，先根据矩形所垂直的轴的分量求出时间，<br>
 再验证其他两个分量在此刻是否在矩形的边界内。
 
+![](images/arealight.jpg)
+![](images/walls.jpg)
 
 ---
 ### 8. 变换
@@ -101,9 +112,14 @@ box的构造函数中的参数包含物体的材质。<br>
 
 修正光线的起点、方向，交点的位置，法向量。
 ```
+![](images/box.jpg)
+![](images/cornell.jpg)
 
+---
 ### 9. 烟雾
 
 各向同性材质的散射方向是随机的<br>
 对物体的两次光线求交确认光线穿过该物体<br>
 横穿的路径长度与密度相关的最长散射距离比较判断是否相交<br>
+
+![](images/smoke.jpg)
