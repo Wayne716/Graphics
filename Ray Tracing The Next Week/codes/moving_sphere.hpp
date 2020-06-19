@@ -1,55 +1,71 @@
 #pragma once
-#include "sphere.hpp"
+#include "hittable.hpp"
 
-class moving_sphere: public hitable {
+class moving_sphere : public hittable {
 public:
     moving_sphere() {}
-    moving_sphere(vec3 cen0, vec3 cen1, float t0, float t1, float r, material *m) :
-            center0(cen0), center1(cen1), time0(t0), time1(t1), radius(r), mat(m) {};
-    virtual bool hit(const ray& r, float tmin, float tmax, hit_record& rec) const;
-    virtual bool boundingBox(float t0, float t1, aabb &box) const;
-    vec3 center(float time) const;
-    vec3 center0, center1;
-    float time0, time1;
-    float radius;
-    material* mat;
+    moving_sphere(
+            point3 cen0, point3 cen1,
+            double t0, double t1,
+            double r, shared_ptr<material> m)
+            :
+            center0(cen0), center1(cen1),
+            time0(t0), time1(t1),
+            radius(r), mat(std::move(m)) {};
+
+    virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const;
+
+    point3 center(double time) const;
+
+    virtual bool bounding_box(double t0, double t1, aabb& output_box) const;
+
+public:
+    point3 center0, center1;
+    double time0, time1;
+    double radius;
+    shared_ptr<material> mat;
 };
 
-bool moving_sphere::boundingBox(float t0, float t1, aabb &box) const {
-    aabb box1 = aabb(center(t0) - vec3(radius, radius, radius), center(t0) + vec3(radius, radius, radius));
-    aabb box2 = aabb(center(t1) - vec3(radius, radius, radius), center(t1) + vec3(radius, radius, radius));
-    box = surroundingBox(box1, box2);
-    return true;
-}
-
-
-vec3 moving_sphere::center(float time) const {
+point3 moving_sphere::center(double time) const {
     return center0 + (time - time0) / (time1 - time0) * (center1 - center0);
 }
 
-bool moving_sphere::hit(const ray &r, float tmin, float tmax, hit_record &rec) const {
+bool moving_sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) const {
     vec3 oc = r.origin() - center(r.time());
-    float a = dot(r.direction(), r.direction());
-    float b = dot(oc, r.direction());
-    float c = dot(oc, oc) - radius * radius;
-    float discriminant = b * b - a * c;
+    auto a = r.direction().length_squared();
+    auto half_b = dot(oc, r.direction());
+    auto c = oc.length_squared() - radius * radius;
+    auto discriminant = half_b * half_b - a * c;
+
     if (discriminant > 0) {
-        float temp = (-b - sqrt(discriminant)) / a;
-        if (temp > tmin && temp < tmax) {
+        auto root = sqrt(discriminant);
+        auto temp = (-half_b - root) / a;
+        if (temp < t_max && temp > t_min) {
             rec.t = temp;
-            rec.p = r.point_at_parameter(rec.t);
-            rec.normal = (rec.p - center(r.time())) / radius;
+            rec.p = r.at(temp);
+            auto outward_normal = (rec.p - center(r.time())) / radius;
+            rec.set_face_normal(r, outward_normal);
             rec.mat = mat;
             return true;
         }
-        temp = (-b + sqrt(discriminant)) / a;
-        if (temp > tmin && temp < tmax) {
+        temp = (-half_b + root) / a;
+        if (temp < t_max && temp > t_min) {
             rec.t = temp;
-            rec.p = r.point_at_parameter(rec.t);
-            rec.normal = (rec.p - center(r.time())) / radius;
+            rec.p = r.at(temp);
+            auto outward_normal = (rec.p - center(r.time())) / radius;
+            rec.set_face_normal(r, outward_normal);
             rec.mat = mat;
             return true;
         }
     }
     return false;
+}
+
+bool moving_sphere::bounding_box(double t0, double t1, aabb& output_box) const {
+    aabb box0(center(t0) - vec3(radius, radius, radius),
+            center(t0) + vec3(radius, radius, radius));
+    aabb box1(center(t1) - vec3(radius, radius, radius),
+            center(t1) + vec3(radius, radius, radius));
+    output_box = surrounding_box(box0, box1);
+    return true;
 }

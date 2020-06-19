@@ -1,45 +1,63 @@
 #pragma once
-#include "hitable.hpp"
+#include "hittable.hpp"
+#include <cmath>
 
-class sphere: public hitable {
+class sphere: public hittable {
 public:
     sphere() {}
-    sphere(vec3 _center, float _radius, material* _mat): center(_center), radius(_radius), mat(_mat) {}
-    virtual bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const;
-    virtual bool boundingBox(float t0, float t1, aabb &box) const;
-    vec3 center;
-    float radius;
-    material *mat;
+    sphere(point3 cen, double r, shared_ptr<material> m) : center(cen), radius(r), mat(std::move(m)) {};
+
+    virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const;
+
+    virtual bool bounding_box(double t0, double t1, aabb& output_box) const;
+public:
+    point3 center;
+    double radius;
+    shared_ptr<material> mat;
 };
 
-bool sphere::boundingBox(float t0, float t1, aabb &box) const {
-    box = aabb(center - vec3(radius, radius, radius), center + vec3(radius, radius, radius));
-    return true;
+void get_sphere_uv(const vec3& p, double& u, double& v) {
+    auto phi = atan2(p.z(), p.x());
+    auto theta = asin(p.y());
+    u = (pi - phi) / (2 * pi);
+    v = (pi + 2 * theta) / (2 * pi);
 }
 
-bool sphere::hit(const ray &r, float t_min, float t_max, hit_record &rec) const {
+bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) const {
     vec3 oc = r.origin() - center;
-    float a = dot(r.direction(), r.direction());
-    float b = dot(oc, r.direction());
-    float c = dot(oc, oc) - radius*radius;
-    float discriminant = b * b - a * c;
+    auto a = r.direction().length_squared();
+    auto half_b = dot(oc, r.direction());
+    auto c = oc.length_squared() - radius * radius;
+    auto discriminant = half_b * half_b - a * c;
+
     if (discriminant > 0) {
-        float temp = (-b - sqrt(discriminant))/a;
-        if (t_min < temp && temp < t_max) {
+        auto root = sqrt(discriminant);
+        auto temp = (-half_b - root) / a;
+        if (temp < t_max && temp > t_min) {
             rec.t = temp;
-            rec.p = r.point_at_parameter(rec.t);
-            rec.normal = (rec.p - center) / radius;
-            rec.mat = this->mat;
+            rec.p = r.at(temp);
+            vec3 outward_normal = (rec.p - center) / radius;
+            rec.set_face_normal(r, outward_normal);
+            rec.mat = mat;
+            get_sphere_uv(outward_normal, rec.u, rec.v);
             return true;
         }
-        temp = (-b + sqrt(discriminant))/a;
-        if (t_min < temp && temp < t_max) {
+        temp = (-half_b + root) / a;
+        if (temp < t_max && temp > t_min) {
             rec.t = temp;
-            rec.p = r.point_at_parameter(rec.t);
-            rec.normal = (rec.p - center) / radius;
-            rec.mat = this->mat;
+            rec.p = r.at(temp);
+            vec3 outward_normal = (rec.p - center) / radius;
+            rec.set_face_normal(r, outward_normal);
+            rec.mat = mat;
+            get_sphere_uv(outward_normal, rec.u, rec.v);
             return true;
         }
     }
     return false;
+}
+
+bool sphere::bounding_box(double t0, double t1, aabb& output_box) const {
+    output_box = aabb(center - vec3(radius, radius, radius),
+            center + vec3(radius, radius, radius));
+    return true;
 }

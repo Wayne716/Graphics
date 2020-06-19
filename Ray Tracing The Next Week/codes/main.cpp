@@ -1,111 +1,167 @@
-#include <iostream>
-#include <fstream>
+#include "color.hpp"
+#include "hittable_list.hpp"
 #include "sphere.hpp"
 #include "moving_sphere.hpp"
-#include "hitable_list.hpp"
-#include "material.hpp"
 #include "camera.hpp"
+#include "common.hpp"
+#include "material.hpp"
+#include "box.hpp"
+#include "constant_medium.hpp"
 
-vec3 color(const ray& r, hitable *world, int depth) {
+color ray_color(const ray& r, const color& background, const hittable& world, int depth) {
     hit_record rec;
-    if (world->hit(r, 0.001, MAXFLOAT, rec)) {
-        ray scattered;
-        vec3 attenuation;
-        if (depth < 50 && rec.mat->scatter(r, rec, attenuation, scattered))
-            return attenuation * color(scattered, world, depth+1);
-        else
-            return vec3(0, 0, 0);
-    }
-    else {
-        vec3 unit_direction = unit_vector(r.direction());
-        float t = 0.5 * (unit_direction.y() + 1.0);
-        return (1 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
-    }
+    if (depth <= 0)
+        return color(0, 0, 0);
+
+    if (!world.hit(r, 0.001, infinity, rec))
+        return background;
+
+    ray scattered;
+    color attenuation;
+    color emitted = rec.mat->emitted(rec.u, rec.v, rec.p);
+
+    if (!rec.mat->scatter(r, rec, attenuation, scattered))
+        return emitted;
+
+    return emitted + attenuation * ray_color(scattered, background, world, depth - 1);
 }
 
-hitable* random_scene() {
-    int n = 100;
-    hitable** list = new hitable*[n+1];
-    texture *checker = new checker_texture(
-            new constant_texture(vec3(0.2, 0.3, 0.1)), new constant_texture(vec3(0.9, 0.9, 0.9)));
-    list[0] = new sphere(vec3(0, -1000, 0), 1000, new lambertian(checker));
-    int i = 1;
-    for (int a=-3; a<6; ++a) {
-        for (int b=-5; b<5; ++b) {
-            float choose_mat = drand48();
-            vec3 center(a+0.9*drand48(), 0.2, b+0.9*drand48());
-            if ((center-vec3(4,0,2.0)).length() > 0.9) {
-                if (choose_mat < 0.8)
-                    list[i++] = new moving_sphere(center, center+vec3(0, 0.5*drand48(), 0), 0.0, 1.0, 0.2,
-                            new lambertian(new constant_texture(vec3(drand48()*drand48(), drand48()*drand48(), drand48()*drand48()))));
-                else if (choose_mat < 0.95)
-                    list[i++] = new sphere(center, 0.2,
-                            new metal(vec3(0.5*(1+drand48()), 0.5*(1+drand48()), 0.5*drand48()), drand48()));
-                else
-                    list[i++] = new sphere(center, 0.2,
-                            new dielectric(1.5));
-            }
-        }
-    }
-    list[i++] = new sphere(vec3(0, 1, 0), 1.0, new dielectric(1.5));
-    list[i++] = new sphere(vec3(-4, 1, 0),1.0, new lambertian(new constant_texture(vec3(0.4, 0.2, 0.1))));
-    list[i++] = new sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0));
-    return new hitable_list(list, i);
+
+hittable_list two_spheres() {
+    hittable_list objects;
+
+    auto checker1 = make_shared<checker_texture>(
+            make_shared<solid_color>(0.9, 0.9, 0.9),
+            make_shared<solid_color>(0.9, 0.3, 0.2)
+            );
+    auto checker2 = make_shared<checker_texture>(
+            make_shared<solid_color>(0.3, 0.6, 1.0),
+            make_shared<solid_color>(0.9, 0.9, 0.9)
+    );
+
+    objects.add(make_shared<sphere>(point3(0, -4, -3), 5, make_shared<lambertian>(checker1)));
+    objects.add(make_shared<sphere>(point3(0, 4, 3), 5, make_shared<lambertian>(checker2)));
+
+    return objects;
 }
 
-hitable* two_spheres() {
-    texture *checker1 = new checker_texture(
-            new constant_texture(vec3(0.9, 0.3, 0.2)), new constant_texture(vec3(1, 1, 1)));
-    texture *checker2 = new checker_texture(
-            new constant_texture(vec3(0.3, 0.6, 1)), new constant_texture(vec3(1, 1, 1)));
-    int n = 50;
-    hitable **list = new hitable*[n+1];
-    list[0] = new sphere(vec3(0, -4, -3), 5, new lambertian(checker1));
-    list[1] = new sphere(vec3(0, 4, 3), 5, new lambertian(checker2));
-    return new hitable_list(list, 2);
+hittable_list two_perlin_spheres() {
+    hittable_list objects;
+
+    auto pertext = make_shared<noise_texture>(5);
+    objects.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<lambertian>(pertext)));
+    objects.add(make_shared<sphere>(point3(0, 2, 0), 2, make_shared<lambertian>(pertext)));
+
+    return objects;
 }
 
-hitable* two_perlin_spheres() {
-    texture *perlin = new noise_texture(5);
-    hitable **list = new hitable*[2];
-    list[0] = new sphere(vec3(0, -1000, 0), 1000, new lambertian(perlin));
-    list[1] = new sphere(vec3(0, 2, 0), 2, new lambertian(perlin));
-    return new hitable_list(list, 2);
+hittable_list earth() {
+    auto earth_texture = make_shared<image_texture>("earthmap.jpg");
+    auto earth_surface = make_shared<lambertian>(earth_texture);
+    auto globe = make_shared<sphere>(point3(0, 0, 0), 2, earth_surface);
+    return hittable_list(globe);
 }
 
-int main()
-{
-    int nx = 400;
-    int ny = 200;
-    int ns = 100;
-    std::ofstream file;
-    file.open("perlin.ppm");
-    file << "P3\n" << nx << ' ' << ny << "\n255\n";
+hittable_list simple_light() {
+    hittable_list objects;
 
-    hitable *world = two_perlin_spheres();
+    auto pertext = make_shared<noise_texture>(4);
+    objects.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<lambertian>(pertext)));
+    objects.add(make_shared<sphere>(point3(0, 2, 0), 2, make_shared<lambertian>(pertext)));
 
-    vec3 lookfrom(13,2,3);
-    vec3 lookat(0,0,0);
-    float focus = 10;
-    camera cam(lookfrom, lookat, vec3(0, 1, 0), 20, float(nx)/float(ny), 0, focus, 0.0, 1.0);
+    auto arealight = make_shared<area_light>(make_shared<solid_color>(4, 4, 4));
+    objects.add(make_shared<xy_rect>(3, 5, 1, 3, -2, arealight));
 
-    for (int j=ny-1; j>=0; --j) {
-        for (int i=0; i<nx; ++i) {
-            vec3 col(0,0,0);
-            for (int s=0; s<ns; ++s) {
-                float u = float(i+drand48()) / float(nx);
-                float v = float(j+drand48()) / float(ny);
+    return objects;
+}
+
+hittable_list cornell_box() {
+    hittable_list objects;
+    auto red = make_shared<lambertian>(make_shared<solid_color>(0.65, 0.05, 0.05));
+    auto white = make_shared<lambertian>(make_shared<solid_color>(0.73, 0.73, 0.73));
+    auto green = make_shared<lambertian>(make_shared<solid_color>(0.12, 0.45, 0.15));
+    auto light = make_shared<area_light>(make_shared<solid_color>(15, 15, 15));
+
+    objects.add(make_shared<flip_face>(make_shared<yz_rect>(0, 555, 0, 555, 555, green)));
+    objects.add(make_shared<yz_rect>(0, 555, 0, 555, 0, red));
+    objects.add(make_shared<xz_rect>(213, 343, 227, 332, 554, light));
+    objects.add(make_shared<flip_face>(make_shared<xz_rect>(0, 555, 0, 555, 0, white)));
+    objects.add(make_shared<xz_rect>(0, 555, 0, 555, 555, white));
+    objects.add(make_shared<flip_face>(make_shared<xy_rect>(0, 555, 0, 555, 555, white)));
+
+    shared_ptr<hittable> box1 = make_shared<box>(point3(0, 0, 0), point3(165, 330, 165), white);
+    box1 = make_shared<rotate_y>(box1, 15);
+    box1 = make_shared<translate>(box1, vec3(265, 0, 295));
+    objects.add(box1);
+
+    shared_ptr<hittable> box2 = make_shared<box>(point3(0, 0, 0), point3(165, 165, 165), white);
+    box2 = make_shared<rotate_y>(box2, -18);
+    box2 = make_shared<translate>(box2, vec3(130, 0, 65));
+    objects.add(box2);
+
+    return objects;
+}
+
+hittable_list cornell_smoke() {
+    hittable_list objects;
+    auto red = make_shared<lambertian>(make_shared<solid_color>(0.65, 0.05, 0.05));
+    auto white = make_shared<lambertian>(make_shared<solid_color>(0.73, 0.73, 0.73));
+    auto green = make_shared<lambertian>(make_shared<solid_color>(0.12, 0.45, 0.15));
+    auto light = make_shared<area_light>(make_shared<solid_color>(15, 15, 15));
+
+    objects.add(make_shared<flip_face>(make_shared<yz_rect>(0, 555, 0, 555, 555, green)));
+    objects.add(make_shared<yz_rect>(0, 555, 0, 555, 0, red));
+    objects.add(make_shared<xz_rect>(213, 343, 227, 332, 554, light));
+    objects.add(make_shared<flip_face>(make_shared<xz_rect>(0, 555, 0, 555, 0, white)));
+    objects.add(make_shared<xz_rect>(0, 555, 0, 555, 555, white));
+    objects.add(make_shared<flip_face>(make_shared<xy_rect>(0, 555, 0, 555, 555, white)));
+
+    shared_ptr<hittable> box1 = make_shared<box>(point3(0, 0, 0), point3(165, 330, 165), white);
+    box1 = make_shared<rotate_y>(box1, 15);
+    box1 = make_shared<translate>(box1, vec3(265, 0, 295));
+    box1 = make_shared<constant_medium>(box1, 0.01, make_shared<solid_color>(0, 0, 0));
+    objects.add(box1);
+
+    shared_ptr<hittable> box2 = make_shared<box>(point3(0, 0, 0), point3(165, 165, 165), white);
+    box2 = make_shared<rotate_y>(box2, -18);
+    box2 = make_shared<translate>(box2, vec3(130, 0, 65));
+    box2 = make_shared<constant_medium>(box2, 0.01, make_shared<solid_color>(1, 1, 1));
+    objects.add(box2);
+
+    return objects;
+}
+
+
+int main() {
+    const auto aspect_ratio = 16.0 / 9.0;
+    const int image_width = 384;
+    const int image_height = static_cast<int>(image_width / aspect_ratio);
+    const int samples_per_pixel = 500;
+    const int max_depth = 50;
+    const color background(0, 0, 0);
+
+    std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+
+    hittable_list world = cornell_smoke();
+
+    point3 look_from(278, 278, -800);
+    point3 look_at(278, 278, 0);
+    camera cam(look_from, look_at, vec3(0,1,0), 40, aspect_ratio, 0.0, 10, 0.0, 1.0);
+
+    // viewport - 3.6 : 2.0
+    // image - 384 : 216
+    for (int j=image_height-1; j>=0; --j) {
+        std::cerr << '\r' << (image_height-j)*100/image_height  << '%' << std::flush;
+        for (int i=0; i<image_width; ++i) {
+             color pixel_color(0, 0, 0);
+            for (int s=0; s<samples_per_pixel; ++s) {
+                auto u = (i + random_double()) / (image_width - 1);
+                auto v = (j + random_double()) / (image_height - 1);
                 ray r = cam.get_ray(u, v);
-                col += color(r, world, 0);
+                pixel_color += ray_color(r, background, world, max_depth);
             }
-            col /= float(ns);
-            if (col[0]<0 || col[1]<0 || col[2]<0) std::cerr << "color error";
-            col = vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
-            int ir = int(255.99*col[0]);
-            int ig = int(255.99*col[1]);
-            int ib = int(255.99*col[2]);
-            file << ir << ' ' << ig << ' ' << ib << '\n';
+            write_color(std::cout, pixel_color, samples_per_pixel);
         }
     }
-    file.close();
+    std::cerr << "\nDone\n";
 }

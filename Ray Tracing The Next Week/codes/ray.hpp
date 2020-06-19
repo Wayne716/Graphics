@@ -4,13 +4,19 @@
 class ray {
 public:
     ray() {}
-    ray(const vec3& _o, const vec3& _d, float _t = 0.0) : o(_o), d(_d), t(_t) {}
-    vec3 origin() const { return o; }
-    vec3 direction() const { return d; }
-    float time() const { return t; }
-    vec3 point_at_parameter(float _t) const { return o + _t * d; }
+    ray(const point3& origin, const vec3& direction, double time = 0.0)
+        : orig(origin), dir(direction), tm(time) {}
 
-    vec3 o;
-    vec3 d;
-    float t;
+    point3 origin() const { return orig; }
+    vec3 direction() const { return dir; }
+    double time() const { return tm; }
+
+    point3 at(double t) const {
+        return orig + t * dir;
+    }
+
+public:
+    point3 orig;
+    vec3 dir;
+    double tm;
 };
