@@ -83,7 +83,7 @@ Perlin Noise：
 
 box继承hittable，以便变换类指向box。<br>
 光线求交由成员hittable_list实现。<br>
-hittable_list中物体的材质由box的构造函数中的参数传入。<br>
+box的构造函数中的参数包含物体的材质。<br>
 
 平移： 
 ```
