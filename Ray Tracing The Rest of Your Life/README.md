@@ -15,3 +15,12 @@ for (int i = 0; i < N; ++i)
      x = (i + random_double) / N
      y = (j + random_double) / N
 ```
+
+---
+### 3. 一维蒙特卡洛
+
+```
+已知被积分函数f(x)及积分域
+选一个积分域上的概率密度函数
+对所有的采样取f(random)/p(random)平均
+```
