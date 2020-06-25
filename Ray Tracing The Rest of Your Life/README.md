@@ -55,5 +55,5 @@ dω = dA / r<sup>2</sup> = sinθdθdφ<br>
 ---
 ### 5. 散射
 
-PDF的积分必须为1
-Lambertian BRDF: ω / 𝜋
+PDF的积分必须为1<br>
+`Lambertian BRDF = ω / 𝜋`
