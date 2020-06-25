@@ -50,3 +50,10 @@ dω = dA / r<sup>2</sup> = sinθdθdφ<br>
 > z = cosθ<br>
 
 以概率密度函数1/4𝜋采样随机单位向量
+
+
+---
+### 5. 散射
+
+PDF的积分必须为1
+Lambertian BRDF: ω / 𝜋
