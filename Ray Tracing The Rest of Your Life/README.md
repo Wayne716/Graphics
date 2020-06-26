@@ -56,4 +56,16 @@ dω = dA / r<sup>2</sup> = sinθdθdφ<br>
 ### 5. 散射
 
 PDF的积分必须为1<br>
-`Lambertian BRDF = ω / 𝜋`
+对PDF = cosθ，在半球上的积分cos(θ)·sin(θ)dθdφ = 𝜋<br>
+令PDF = cosθ / 𝜋<br>
+
+`Lambertian BRDF = ω · 散射方向PDF / cosθ =  ω / 𝜋`
+
+
+---
+### 6. 漫反射
+
+
+散射的方向是半球的随机向量<br>
+光线方向的PDF = cosθ / 𝜋<br>
+对返回的颜色进行修正除以PDF<br>
