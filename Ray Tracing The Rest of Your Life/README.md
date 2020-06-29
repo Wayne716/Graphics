@@ -110,7 +110,7 @@ u = v x w
 
 调整光的散射方向至光源平面中的随机一点<br>
 
-> 𝑑𝑤 = 𝑑A · cos(𝑎) / r<sup>2</sup>br>
+> 𝑑𝑤 = 𝑑A · cos(𝑎) / r<sup>2</sup><br>
 > PDF · 𝑑𝑤 = dA / A<br>
 > PDF = r<sup>2</sup> / (cos(𝑎) · A)
 
