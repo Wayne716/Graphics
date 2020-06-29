@@ -110,8 +110,8 @@ u = v x w
 
 调整光的散射方向至光源平面中的随机一点<br>
 
-> 𝑑𝑤 = 𝑑A·cos𝑎 / r<sup>2</sup> 𝑎为光源面与投影面的夹角<br>
-> PDF·𝑑𝑤 = dA / A<br>
+> 𝑑𝑤 = 𝑑A · cos𝑎 / r<sup>2</sup> 𝑎为光源面与投影面的夹角<br>
+> PDF · 𝑑𝑤 = dA / A<br>
 > PDF = r<sup>2</sup> / (cos𝑎 · A)
 
 
