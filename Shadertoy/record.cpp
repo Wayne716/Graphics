@@ -13,7 +13,7 @@ float Band(float t, float start, float end, float blur)
     
     float step2 = smoothstep(end + blur, end - blur, t);
     
-   	return step1 * step2;
+    return step1 * step2;
 }
 
 float Rect(vec2 uv, float left, float right, float bottom, float top, float blur)
@@ -41,7 +41,7 @@ float Smiley(vec2 uv, vec2 p, float size)
     
     mouth -= Circle(uv, vec2(.0, .1), .24, .02);
     
-	mask -= mouth;
+    mask -= mouth;
     
     return mask;
 }
