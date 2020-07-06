@@ -4,19 +4,27 @@
 const unsigned int SCR_WIDTH  = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-static const char* vertexShaderSource = "#version 330 core\n"
-                                        "layout (location = 0) in vec3 pos;\n"
-                                        "void main()\n"
-                                        "{\n"
-                                        "gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);\n"
-                                        "}\n";
+static const char* vertexShaderSource = R"glsl(
+                                        #version 330 core
+                                        layout (location = 0) in vec3 pos;
+                                        layout (location = 1) in vec3 col;
+                                        out vec3 color;
+                                        void main()
+                                        {
+                                           color = col;
+                                           gl_Position = vec4(pos, 1.0);
+                                        }
+                                        )glsl";
 
-static const char* fragmentShaderSource = "#version 330 core\n"
-                                        "out vec4 FragColor;\n"
-                                        "void main()\n"
-                                        "{\n"
-                                        "FragColor = vec4(pos.x, .5f, .2f, 1.0f);\n"
-                                        "}\n";
+static const char* fragmentShaderSource = R"glsl(
+                                        #version 330 core
+                                        in vec3 color;
+                                        out vec4 FragColor;
+                                        void main()
+                                        {
+                                           FragColor = vec4(color, 1.0f);
+                                        }
+                                        )glsl";
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
@@ -91,38 +99,50 @@ int main()
     
     // ==================== Vertex
     
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
-    
-    glBindVertexArray(VAO);
-    
-    
-    // 顶点缓冲对象在GPU管理顶点的内存
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
-    
-    // 绑定生成的顶点缓冲对象到GL_ARRAY_BUFFER
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    
     float vertices[] = {
         -.5f, -.5f, .0f,
         0.5f, -.5f, .0f,
         0.0f, 0.5f, .0f
     };
     
+    float colors[] = {
+        1.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f
+    };
+    
+
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    // 顶点缓冲对象在GPU管理顶点的内存
+    unsigned int PointsVBO;
+    glGenBuffers(1, &PointsVBO);
+    
+    // 绑定生成的顶点缓冲对象到GL_ARRAY_BUFFER
+    glBindBuffer(GL_ARRAY_BUFFER, PointsVBO);
+    
     // 把定义的顶点数据复制到缓冲的内存中
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    
-    // 定义如何解析顶点数据
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     
-    // 以顶点属性位置为参数启用顶点属性
+
+    unsigned int ColorsVBO;
+    glGenBuffers(1, &ColorsVBO);
+    
+    // 同一时间不能绑定两个相同类型的缓冲对象
+    glBindBuffer(GL_ARRAY_BUFFER, ColorsVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    
     glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
     
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
         
-        glClearColor(.2f, .3f, .1f, 1.0f);
+        glClearColor(.8f, .8f, .8f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         
         glUseProgram(shaderProgram);
@@ -136,7 +156,8 @@ int main()
     }
     
     glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &PointsVBO);
+    glDeleteBuffers(1, &ColorsVBO);
     glDeleteProgram(shaderProgram);
     
     glfwTerminate();
