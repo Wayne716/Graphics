@@ -59,6 +59,34 @@ void processInput(GLFWwindow* window) {
         camera.ProcessKeyboard(RIGHT, deltaTime);
 }
 
+unsigned int loadTexture(const char* path) {
+    unsigned int tex;
+    glGenTextures(1, &tex);
+    
+    int width, height, colorChannel;
+    unsigned char* data = stbi_load(path, &width, &height, &colorChannel, 0);
+    if (data) {
+        GLenum format = (colorChannel == 3)? GL_RGB : GL_RGBA;
+        glBindTexture(GL_TEXTURE_2D, tex);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        
+        glGenerateMipmap(GL_TEXTURE_2D);
+        
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        
+        stbi_image_free(data);
+    }
+    else {
+        std::cout << "FAILED LOADING IMAGE" << std::endl;
+        stbi_image_free(data);
+    }
+    
+    return tex;
+}
+
 int main()
 {
     glfwInit();
@@ -163,44 +191,11 @@ int main()
     
     // ==================== Texture
     
-    int width, height, colorChannel;
     stbi_set_flip_vertically_on_load(true);
     
-    unsigned int wood;
-    glGenTextures(1, &wood);
-    glBindTexture(GL_TEXTURE_2D, wood);
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    
-    unsigned char* data = stbi_load("wood.png", &width, &height, &colorChannel, 0);
-    if (!data) std::cout << "FAILED LOADING IMAGE" << std::endl;
-    
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    
-    glGenerateMipmap(GL_TEXTURE_2D);
-    
-    stbi_image_free(data);
-    
-    unsigned int bar;
-    glGenTextures(1, &bar);
-    glBindTexture(GL_TEXTURE_2D, bar);
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    
-    data = stbi_load("bar.png", &width, &height, &colorChannel, 0);
-    if (!data) std::cout << "FAILED LOADING IMAGE" << std::endl;
-    
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    
-    glGenerateMipmap(GL_TEXTURE_2D);
-    
-    stbi_image_free(data);
+    unsigned int wood = loadTexture("wood.png");
+    unsigned int bar = loadTexture("bar.png");
+    unsigned int symbols = loadTexture("symbols.jpg");
     
     
     // ==================== Shader
@@ -211,6 +206,7 @@ int main()
     cube.use();
     cube.setInt("material.diffuse", 0);
     cube.setInt("material.specular", 1);
+    cube.setInt("material.emit", 2);
     cube.setFloat("material.shininess", 64.0f);
    
     cube.setVec3("light.ambient", glm::vec3(0.2f));
@@ -235,13 +231,9 @@ int main()
         glClearColor(.1f, .1f, .1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, wood);
-        
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, bar);
-        
         cube.use();
+        
+        cube.setFloat("emitio", (sin(currentFrame) + 1) * 0.5);
         
         cube.setVec3("viewPos", camera.Position);
         
@@ -263,6 +255,15 @@ int main()
         model = glm::translate(model, lightPos);
         model = glm::scale(model, glm::vec3(0.2f));
         light.setMat4("model", model);
+        
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, wood);
+        
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, bar);
+        
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, symbols);
         
         glBindVertexArray(lightVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
