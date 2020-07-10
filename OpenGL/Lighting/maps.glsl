@@ -10,6 +10,7 @@ struct Material {
     // 纹理采集器
     sampler2D diffuse;
     sampler2D specular;
+    sampler2D emit;
     float shininess;
 };
 
@@ -23,6 +24,7 @@ struct Light {
 uniform vec3 viewPos;
 uniform Material material;
 uniform Light light;
+uniform float emitio;
 
 void main()
 {
@@ -38,7 +40,8 @@ void main()
     // 根据纹理的颜色亮度定义镜面反射强度
     vec3 specular = spec * vec3(texture(material.specular, UV)) * light.specular;
     
-    // 边框上的颜色强度增加了
-    vec3 result = specular + diffuse + ambient;
+    vec3 emit = vec3(texture(material.emit, UV)) * emitio * 0.3;
+    
+    vec3 result = specular + diffuse + ambient + emit;
     FragColor = vec4(result, 1.0f);
 }
