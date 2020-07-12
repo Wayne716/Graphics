@@ -16,3 +16,15 @@
   
 
 ---
+### 模板测试
+
+* 由`glStencilMask(掩码)`设置写入缓冲开关<br>
+  * `glStencilMask(0xFF)` 开启
+  * `glStencilMask(0x00)` 关闭
+
+* 由`glStencilOp(模板失败, 模板失败深度通过, 均通过)`设置写入缓冲的方式<br>
+  * `glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)` 均通过时写入Stencil Buffer
+
+* 由`glStencilFunc(测试通过条件, 参照值, 掩码)`设置测试通过条件<br>
+  * `glStencilFunc(GL_ALWAYS, 1, 0xFF)` 让原物体通过测试以写入Stencil Buffer
+  * `glStencilFunc(GL_NOTEQUAL, 1, 0xFF)` 让纯色放大物体的边缘通过测试
