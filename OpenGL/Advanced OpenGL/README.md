@@ -28,3 +28,16 @@
 * 由`glStencilFunc(测试通过条件, 参照值, 掩码)`设置测试通过条件<br>
   * `glStencilFunc(GL_ALWAYS, 1, 0xFF)` 让原物体通过测试以写入Stencil Buffer
   * `glStencilFunc(GL_NOTEQUAL, 1, 0xFF)` 让纯色放大物体的边缘通过测试
+
+
+---
+### 混合
+
+* 对纹理图像中的透明部分在着色器中丢弃掉<br>
+  `if (FragColor.a < 0.1f) discard;`
+
+* 由glBlendFunc(源颜色影响因子值, 目标颜色影响因子值)混合透明图像<br>
+  `glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)`
+
+* 先渲染不透明物体 再由远及近渲染透明物体<br>
+
