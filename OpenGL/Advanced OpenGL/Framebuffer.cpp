@@ -1,12 +1,12 @@
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "shader.h"
 #include "camera.h"
-#include "model.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
-
 #include <iostream>
 
 const unsigned int SCR_WIDTH  = 800;
@@ -183,8 +183,8 @@ int main()
     
     glEnable(GL_DEPTH_TEST);
     
-    Shader shader("depth.vs", "depth.fs");
-    Shader screenShader("screen.vs", "screen.fs");
+    Shader shader0("shader.vs", "shader.fs");
+    Shader shader1("screen.vs", "screen.fs");
     
     // cube
     unsigned int cubeVAO, cubeVBO;
@@ -235,38 +235,39 @@ int main()
     glBindVertexArray(0);
     
     
-    
     unsigned int cubeTexture = loadTexture("texture/container.jpg");
     unsigned int planeTexture = loadTexture("texture/metal.png");
     
-    shader.use();
-    shader.setInt("tex1", 0);
+    shader0.use();
+    shader0.setInt("tex1", 0);
     
-    screenShader.use();
-    screenShader.setInt("screenTexture", 0);
+    shader1.use();
+    shader1.setInt("screenTexture", 0);
     
-    // 创建帧缓冲
+
     unsigned int framebuffer;
     glGenFramebuffers(1, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         
     // 纹理(附件)
-    unsigned int textureColorbuffer;
-    glGenTextures(1, &textureColorbuffer);
-    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-    // 仅分配内存而没有填充
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    // 不需要环绕方式
+    unsigned int tex;
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH * 2, SCR_HEIGHT * 2, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
     // 帧缓冲目标 附件类型 纹理类型 纹理本身 多集渐远纹理级别
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
+    
     
     // 渲染缓冲对象(附件)
     unsigned int rbo;
     glGenRenderbuffers(1, &rbo);
     glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH * 2, SCR_HEIGHT * 2);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
     
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -290,12 +291,12 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        shader.use();
+        shader0.use();
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(camera.FOV), (float)SCR_WIDTH/(float)SCR_HEIGHT, 0.1f, 100.0f);
-        shader.setMat4("view", view);
-        shader.setMat4("projection", projection);
+        shader0.setMat4("view", view);
+        shader0.setMat4("projection", projection);
         
         glActiveTexture(GL_TEXTURE0);
         
@@ -303,16 +304,16 @@ int main()
         glBindVertexArray(cubeVAO);
         glBindTexture(GL_TEXTURE_2D, cubeTexture);
         model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
-        shader.setMat4("model", model);
+        shader0.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         model = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 0.0f, 0.0f));
-        shader.setMat4("model", model);
+        shader0.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         
         // draw floor
         glBindVertexArray(planeVAO);
         glBindTexture(GL_TEXTURE_2D, planeTexture);
-        shader.setMat4("model", glm::mat4(1.0f));
+        shader0.setMat4("model", glm::mat4(1.0f));
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
         
@@ -323,9 +324,9 @@ int main()
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         
-        screenShader.use();
+        shader1.use();
         glBindVertexArray(quadVAO);
-        glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+        glBindTexture(GL_TEXTURE_2D, tex);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         
         glfwSwapBuffers(window);
