@@ -52,9 +52,9 @@
 ---
 ### 帧缓冲
 
-* 由glBindFramebuffer(GL_FRAMEBUFFER, FBO)进行离屏渲染<br>
+* 由`glBindFramebuffer(GL_FRAMEBUFFER, FBO)`进行离屏渲染<br>
   * 纹理(颜色附件)必须包含，初始化只需要分配空间，实时渲染时将颜色结果写入到纹理附件中。
   * 渲染缓冲对象是不可读的，适合不需要采样的深度测试和模板测试。
 
-* 由glBindFramebuffer(GL_FRAMEBUFFER, 0)将已渲染的纹理颜色附件作为新的纹理，<br>
+* 由`glBindFramebuffer(GL_FRAMEBUFFER, 0)`将已渲染的纹理颜色附件作为新的纹理，<br>
   渲染到铺展的屏幕平面上，再由卷积运算实现滤镜效果。
