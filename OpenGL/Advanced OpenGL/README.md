@@ -58,3 +58,11 @@
 
 * 由`glBindFramebuffer(GL_FRAMEBUFFER, 0)`将已渲染的纹理颜色附件作为新的纹理，<br>
   渲染到铺展的屏幕平面上，再由卷积运算实现滤镜效果。
+  
+  
+---
+### 立方体贴图
+
+* 立方体贴图由方向向量决定纹理坐标，可直接实现天空盒和通过反射或折射实现环境映射。<br>
+  * `view = mat4(mat3(camera.GetViewMatrix()))`保留旋转缩放丢弃位移
+  * `gl_Position = pos.xyww`透视除法在顶点着色器之后计算Z值为最大深度1(分量/w)
