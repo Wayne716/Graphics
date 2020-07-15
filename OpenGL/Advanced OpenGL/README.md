@@ -87,3 +87,10 @@
   * `glBindBufferRange(GL_UNIFORM_BUFFER, bindingPoint, buffer, offset, sizeof(data))`<br>
     将缓冲对象绑定到std140布局的绑定点上
 
+
+---
+### 几何着色器
+
+* 通过`gl_in[index].gl_Position`读取`layout (Primitive) in`传入的图形数据<br>
+
+* `layout (Primitive, max_vertices) out`将结果送入下一阶段
