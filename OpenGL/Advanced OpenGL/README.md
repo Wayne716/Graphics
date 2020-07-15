@@ -78,5 +78,12 @@
 * 由`glBufferSubData(GL_ARRAY_BUFFER, offset, sizeof(data), &data)`批量填充缓冲
 
 
+---
+### 高级GLSL
 
+* Uniform block 布局空间为std140，而不像uniform共享空间、变量位置可变动。<br>
+  * 由`glGetUniformBlockIndex(shaderProgram, blockName)`获取顶点着色器中的块的序号
+  * `glUniformBlockBinding(shaderProgram, index, bindingPoint)`将块绑定到std140布局的绑定点上
+  * `glBindBufferRange(GL_UNIFORM_BUFFER, bindingPoint, buffer, offset, sizeof(data))`<br>
+    将缓冲对象绑定到std140布局的绑定点上
 
