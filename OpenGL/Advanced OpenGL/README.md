@@ -66,3 +66,17 @@
 * 立方体贴图由方向向量决定纹理坐标，可直接实现天空盒和通过反射或折射实现环境映射。<br>
   * `view = mat4(mat3(camera.GetViewMatrix()))`保留旋转缩放丢弃位移
   * `gl_Position = pos.xyww`透视除法在顶点着色器之后计算Z值为最大深度1(分量/w)
+
+
+---
+### 高级数据
+
+* `glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY)`获得目标内存指针可以直接复制数据到缓冲<br>
+  `glUnmapBuffer(GL_ARRAY_BUFFER)`解绑并释放该指针
+  
+  
+* 由`glBufferSubData(GL_ARRAY_BUFFER, offset, sizeof(data), &data)`批量填充缓冲
+
+
+
+
