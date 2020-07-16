@@ -94,3 +94,30 @@
 * 通过`gl_in[index].gl_Position`读取`layout (Primitive) in`传入的图形数据<br>
 
 * `layout (Primitive, max_vertices) out`将结果送入下一阶段
+
+
+---
+### 实例化
+
+
+* `glVertexAttribPointer`顶点属性最大允许128字节，mat4需要拆分成4个vec4。
+
+* `glVertexAttribDivisor(index, instances)`设置渲染新实例的时候更新顶点属性，否则为每个顶点更新。  
+  
+* 定义顶点属性，将实例化数组传入顶点着色器中，这样只对普通顶点逐点更新。<br>
+  * `glDrawArraysInstanced(GL_TRIANGLES, first, elementsCount, amount)`
+  * `glDrawElementsInstanced(GL_TRIANGLES, elementsCount, type, indicesPointer, amount)`
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
