@@ -109,15 +109,13 @@
   * `glDrawElementsInstanced(GL_TRIANGLES, elementsCount, type, indicesPointer, amount)`
   
 
+---
+### 抗锯齿
 
+* 通过`glBlitFramebuffer`将`GL_READ_FRAMEBUFFER`复制到`GL_WRITE_FRAMEBUFFER`实现离屏MSAA<br>
 
-
-
-
-
-
-
-
-
-
-
+  * MSAA scene framebuffer
+    * Color: Multisample 2D texture
+    * Depth & Stencil: Renderbuffer with multisample storage
+  * Screen output framebuffer
+    * Color: 2d texture
