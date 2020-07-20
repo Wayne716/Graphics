@@ -71,3 +71,18 @@
 
 
 * 曝光色调映射：LDR = 1 - e<sup>-HDR·exposure</sup> 
+
+
+---
+### 泛光
+
+> Offscreen Frame Buffer
+>> Texture Color Attachment 0:   LDR Scene<br>
+>> Texture Color Attachment 1:   HDR Bloom<br>
+>> Render Buffer Attachment
+
+* 由两个FBO绑定纹理附件实现两步高斯模糊<br>
+  * 每次在一个FBO中对另一个FBO的纹理附件采样
+  * 初始化时对泛光纹理(HDR Bloom)采样
+
+* 对LDR Scene和Bloom模糊结果混合，再作色调映射实现。
