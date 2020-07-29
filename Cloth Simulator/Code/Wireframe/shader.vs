@@ -1,0 +1,1 @@
+#version 330 corein vec3 pos;in vec3 nor;out vec3 position;out vec3 normal;uniform mat4 projection;uniform mat4 view;uniform mat4 model;void main(){    position = pos;    normal = nor;        gl_PointSize = 4.0;    gl_Position = projection * view * model * vec4(pos, 1.0);}
