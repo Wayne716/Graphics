@@ -1,7 +1,7 @@
 
 
 
-### `/Wireframe`
+### `/Wireframe`  *(basic)*
 __simple cloth based on mass-spring model__
 
 <br>
