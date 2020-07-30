@@ -6,3 +6,6 @@
 
 ### NORMAL
 <img src="Normal.png" width="400" height="300">
+
+### LIGHTING
+<img src="Lighting.png" width="400" height="300">
