@@ -1,11 +1,28 @@
 
 
 
-### WIREFRAME
+### `/Wireframe`  *(base)*
+__simple cloth based on mass-spring model__
+
 <img src="Wireframe.png" width="400" height="300">
 
-### NORMAL
+<br>
+
+### `/Normal`  *(update)*
+__fragment color as normal vector from mesh__
+
 <img src="Normal.png" width="400" height="300">
 
-### LIGHTING
+<br>
+
+### `/Light`  *(update)*
+__load texture image and implement blinn phong lighting model__
+
 <img src="Lighting.png" width="400" height="300">
+
+<br>
+
+### `/Sphere`  *(update)*
+__draw sphere and collide with sphere__
+
+<img src="Sphere.png" width="400" height="300">
