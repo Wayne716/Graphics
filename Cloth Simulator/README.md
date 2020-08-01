@@ -22,7 +22,7 @@ __load texture image and implement blinn phong lighting model__
 
 <br>
 
-### `/Sphere`  *(update)*
-__draw sphere and collide with sphere__
+### `/Collision`  *(update)*
+__self collide and collide with sphere__
 
 <img src="Sphere.png" width="400" height="300">
