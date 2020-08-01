@@ -15,7 +15,7 @@ __fragment color as normal vector from mesh__
 
 <br>
 
-### [`/Light`](https://github.com/Wayne716/Graphics/tree/master/Cloth%20Simulator/Code/Light)  *(update)*
+### [`/Lighting`](https://github.com/Wayne716/Graphics/tree/master/Cloth%20Simulator/Code/Lighting)  *(update)*
 __load texture image and implement blinn phong lighting model__
 
 <img src="Lighting.png" width="400" height="300">
